@@ -180,14 +180,16 @@ apiRouter.get('/proposals/:id/events', (req, res) => {
 app.use('/api', apiRouter);
 app.use(apiRouter);
 
-// Serve static frontend files with explicit no-cache for scripts/styles/html
-app.use(express.static(__dirname, {
+// Serve static frontend files from public (and root fallback) with explicit no-cache
+const staticOptions = {
   setHeaders: (res, filePath) => {
     if (filePath.endsWith('.html') || filePath.endsWith('.js') || filePath.endsWith('.css') || filePath.endsWith('sw.js')) {
       res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
     }
   }
-}));
+};
+app.use(express.static(path.join(__dirname, 'public'), staticOptions));
+app.use(express.static(__dirname, staticOptions));
 
 // Route non-asset URLs to index.html (never serve index.html for static assets)
 app.get('*', (req, res) => {
