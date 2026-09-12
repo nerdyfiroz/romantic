@@ -76,6 +76,10 @@ async function saveProposalToSupabase(proposal) {
   const supabase = getSupabase();
   if (!supabase) return;
   try {
+    const payloadData = {
+      ...proposal,
+      music: proposal.music || (proposal.payload && proposal.payload.music) || null
+    };
     const { error } = await supabase.from('proposals').upsert({
       id: proposal.id,
       sender: proposal.sender,
@@ -92,7 +96,7 @@ async function saveProposalToSupabase(proposal) {
       touch_fx: proposal.touchFx,
       custom_note: proposal.customNote || '',
       custom_vow: proposal.customVow || '',
-      payload: proposal
+      payload: payloadData
     });
     if (error) {
       console.warn('Supabase upsert warning:', error.message);
@@ -156,11 +160,13 @@ async function fetchProposalFromSupabase(id) {
     if (!data) return null;
 
     if (data.payload && typeof data.payload === 'object' && data.payload.id) {
+      const musicConfig = data.payload.music || data.music || null;
       return {
         ...data.payload,
         status: data.status || data.payload.status,
         replyNote: data.reply_note !== undefined ? data.reply_note : data.payload.replyNote,
-        acceptedAt: data.accepted_at || data.payload.acceptedAt
+        acceptedAt: data.accepted_at || data.payload.acceptedAt,
+        music: musicConfig
       };
     }
 
@@ -179,7 +185,8 @@ async function fetchProposalFromSupabase(id) {
       particleDensity: data.particle_density || 'medium',
       touchFx: data.touch_fx || 'sparkles',
       customNote: data.custom_note || '',
-      customVow: data.custom_vow || ''
+      customVow: data.custom_vow || '',
+      music: data.music || null
     };
   } catch (err) {
     console.warn('Supabase fetch error:', err.message);
@@ -187,8 +194,161 @@ async function fetchProposalFromSupabase(id) {
   }
 }
 
+// Royalty-free licensed music catalog
+let musicCatalog = [];
+const MUSIC_CATALOG_FILE = path.join(__dirname, 'data', 'music-catalog.json');
+if (fs.existsSync(MUSIC_CATALOG_FILE)) {
+  try {
+    musicCatalog = JSON.parse(fs.readFileSync(MUSIC_CATALOG_FILE, 'utf8'));
+  } catch (err) {
+    console.error('Error reading music-catalog.json:', err);
+  }
+}
+
+const MUSIC_CATEGORIES = [
+  { id: 'all', label: 'All Romantic Melodies', icon: '✨' },
+  { id: 'romantic', label: 'Romantic', icon: '❤️' },
+  { id: 'wedding', label: 'Wedding & Vows', icon: '💍' },
+  { id: 'piano', label: 'Tender Piano', icon: '🎹' },
+  { id: 'emotional', label: 'Emotional & Deep', icon: '🌹' },
+  { id: 'dreamy', label: 'Dreamy & Starlight', icon: '✨' },
+  { id: 'calm', label: 'Calm Twilight', icon: '🌙' },
+  { id: 'love', label: 'Sweet Love', icon: '💕' },
+  { id: 'cinematic', label: 'Cinematic Romance', icon: '🎻' },
+  { id: 'sentimental', label: 'Sentimental', icon: '💌' },
+  { id: 'acoustic', label: 'Acoustic Guitar', icon: '🌸' },
+  { id: 'bangla_hindi', label: 'Bangla & Hindi Romance', icon: '🎶' },
+  { id: 'spiritual', label: 'Peaceful Spiritual Nasheed', icon: '🕌' }
+];
+
+// In-memory cache for frequent music searches (1-hour TTL)
+const searchCache = new Map();
+
+// Helper to sanitize music configuration object
+function sanitizeMusicPayload(rawMusic) {
+  if (!rawMusic || typeof rawMusic !== 'object') return null;
+  if (!rawMusic.track_id && !rawMusic.audio_url) return null;
+
+  // Look up track in catalog if present to ensure complete metadata
+  let catalogTrack = null;
+  if (rawMusic.track_id && Array.isArray(musicCatalog)) {
+    catalogTrack = musicCatalog.find(t => t.track_id === rawMusic.track_id);
+  }
+
+  const audioUrl = rawMusic.audio_url || (catalogTrack ? catalogTrack.audio_url : '');
+  if (!audioUrl) return null;
+
+  return {
+    enabled: Boolean(rawMusic.enabled !== false),
+    track_id: String(rawMusic.track_id || (catalogTrack ? catalogTrack.track_id : '')).slice(0, 100),
+    title: String(rawMusic.title || (catalogTrack ? catalogTrack.title : 'Romantic Melody')).slice(0, 150),
+    artist: String(rawMusic.artist || (catalogTrack ? catalogTrack.artist : 'Unknown Artist')).slice(0, 150),
+    category: String(rawMusic.category || (catalogTrack ? catalogTrack.category : 'romantic')).slice(0, 50),
+    duration: typeof rawMusic.duration === 'number' ? rawMusic.duration : (catalogTrack ? catalogTrack.duration : 0),
+    duration_formatted: String(rawMusic.duration_formatted || (catalogTrack ? catalogTrack.duration_formatted : '')).slice(0, 20),
+    audio_url: String(audioUrl).slice(0, 500),
+    stream_url: `/api/music/stream/${rawMusic.track_id || (catalogTrack ? catalogTrack.track_id : '')}`,
+    source: String(rawMusic.source || (catalogTrack ? catalogTrack.source : 'Royalty-Free Catalog')).slice(0, 100),
+    source_url: String(rawMusic.source_url || (catalogTrack ? catalogTrack.source_url : '')).slice(0, 500),
+    license: String(rawMusic.license || (catalogTrack ? catalogTrack.license : 'Creative Commons / Royalty-Free')).slice(0, 150),
+    license_url: String(rawMusic.license_url || (catalogTrack ? catalogTrack.license_url : '')).slice(0, 500),
+    attribution_required: Boolean(rawMusic.attribution_required !== undefined ? rawMusic.attribution_required : (catalogTrack ? catalogTrack.attribution_required : true)),
+    attribution_text: String(rawMusic.attribution_text || (catalogTrack ? catalogTrack.attribution_text : '')).slice(0, 500),
+    volume: typeof rawMusic.volume === 'number' ? Math.max(0, Math.min(1, rawMusic.volume)) : 0.35,
+    loop: rawMusic.loop !== undefined ? Boolean(rawMusic.loop) : true,
+    start_time: typeof rawMusic.start_time === 'number' ? Math.max(0, Math.min(60, rawMusic.start_time)) : 0,
+    fade_in: typeof rawMusic.fade_in === 'number' ? Math.max(0, Math.min(10, rawMusic.fade_in)) : 3,
+    fade_out: typeof rawMusic.fade_out === 'number' ? Math.max(0, Math.min(10, rawMusic.fade_out)) : 3
+  };
+}
+
 // Proposals API Router - mounted at both /api and root / for seamless Vercel / serverless routing
 const apiRouter = express.Router();
+
+// API: Music categories
+apiRouter.get('/music/categories', (req, res) => {
+  res.json({ success: true, categories: MUSIC_CATEGORIES });
+});
+
+// API: Search music catalog with caching and category filtering
+apiRouter.get('/music/search', async (req, res) => {
+  const query = (req.query.q || '').trim().toLowerCase();
+  const category = (req.query.category || '').trim().toLowerCase();
+  const cacheKey = `${query}|${category}`;
+
+  const cached = searchCache.get(cacheKey);
+  if (cached && cached.expiresAt > Date.now()) {
+    return res.json({ success: true, fromCache: true, count: cached.results.length, tracks: cached.results });
+  }
+
+  const results = musicCatalog.filter(track => {
+    // Filter by category
+    if (category && category !== 'all') {
+      const inCat = track.category === category ||
+        (Array.isArray(track.categories) && track.categories.includes(category));
+      if (!inCat) return false;
+    }
+    // Filter by text search
+    if (query) {
+      const match =
+        track.title.toLowerCase().includes(query) ||
+        track.artist.toLowerCase().includes(query) ||
+        (track.description && track.description.toLowerCase().includes(query)) ||
+        (Array.isArray(track.tags) && track.tags.some(t => t.toLowerCase().includes(query))) ||
+        (track.category && track.category.toLowerCase().includes(query));
+      if (!match) return false;
+    }
+    return true;
+  });
+
+  // Store in cache (1 hour)
+  searchCache.set(cacheKey, { results, expiresAt: Date.now() + 60 * 60 * 1000 });
+  res.json({ success: true, count: results.length, tracks: results });
+});
+
+// API: Single track details and license
+apiRouter.get('/music/tracks/:id', (req, res) => {
+  const track = musicCatalog.find(t => t.track_id === req.params.id);
+  if (!track) return res.status(404).json({ error: 'Track not found' });
+  res.json({ success: true, track });
+});
+
+// API: Stream proxy for reliable cross-origin audio streaming
+apiRouter.get('/music/stream/:id', (req, res) => {
+  const track = musicCatalog.find(t => t.track_id === req.params.id);
+  if (!track || !track.audio_url) {
+    return res.status(404).json({ error: 'Track not found in licensed catalog' });
+  }
+
+  const https = require('https');
+  const http = require('http');
+
+  function pipeFromUrl(targetUrl, redirectCount = 0) {
+    if (redirectCount > 3) {
+      return res.status(500).json({ error: 'Too many audio redirects' });
+    }
+    const client = targetUrl.startsWith('https') ? https : http;
+    client.get(targetUrl, (upstreamRes) => {
+      if (upstreamRes.statusCode >= 300 && upstreamRes.statusCode < 400 && upstreamRes.headers.location) {
+        return pipeFromUrl(upstreamRes.headers.location, redirectCount + 1);
+      }
+      res.writeHead(upstreamRes.statusCode || 200, {
+        'Content-Type': upstreamRes.headers['content-type'] || 'audio/mpeg',
+        'Accept-Ranges': 'bytes',
+        'Access-Control-Allow-Origin': '*',
+        'Cache-Control': 'public, max-age=86400'
+      });
+      upstreamRes.pipe(res);
+    }).on('error', (err) => {
+      console.warn('Audio stream proxy error:', err.message);
+      if (!res.headersSent) {
+        res.status(502).json({ error: 'Failed to stream audio upstream', details: err.message });
+      }
+    });
+  }
+
+  pipeFromUrl(track.audio_url);
+});
 
 // API: Health and Storage Check
 apiRouter.get('/health', (req, res) => {
@@ -236,7 +396,9 @@ apiRouter.post('/proposals', async (req, res) => {
     particleDensity = 'medium',
     touchFx = 'sparkles',
     customNote = '',
-    customVow = ''
+    customVow = '',
+    music = null,
+    payload = {}
   } = req.body || {};
 
   if (!sender || typeof sender !== 'string' || !sender.trim()) {
@@ -261,6 +423,7 @@ apiRouter.post('/proposals', async (req, res) => {
   const cleanTouch = allowedTouch.includes(touchFx) ? touchFx : 'sparkles';
   const cleanNote = typeof customNote === 'string' ? customNote.trim().slice(0, 1000) : '';
   const cleanVow = typeof customVow === 'string' ? customVow.trim().slice(0, 1000) : '';
+  const cleanMusic = sanitizeMusicPayload(music || (payload && payload.music));
 
   // Cryptographically secure, unpredictable 128-bit proposal token (32 hex chars)
   const secureId = 'love-' + crypto.randomBytes(16).toString('hex');
@@ -280,7 +443,12 @@ apiRouter.post('/proposals', async (req, res) => {
     status: 'pending',
     createdAt: new Date().toISOString(),
     acceptedAt: null,
-    replyNote: ''
+    replyNote: '',
+    music: cleanMusic,
+    payload: {
+      ...(typeof payload === 'object' ? payload : {}),
+      music: cleanMusic
+    }
   };
 
   proposals[secureId] = newProposal;

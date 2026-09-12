@@ -13,6 +13,7 @@ const filesToCopy = [
   'index.html',
   'style.css',
   'script.js',
+  'music-client.js',
   'sw.js',
   'manifest.json'
 ];
