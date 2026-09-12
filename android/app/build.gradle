@@ -17,9 +17,23 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    signingConfigs {
+        release {
+            if (file("release.keystore").exists()) {
+                storeFile file("release.keystore")
+                storePassword "romantic123"
+                keyAlias "romantic"
+                keyPassword "romantic123"
+            }
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
+            if (file("release.keystore").exists()) {
+                signingConfig = signingConfigs.release
+            }
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"

@@ -1,6 +1,24 @@
 // Dynamic Emotional Love Universe Engine
 // Personalization for couples with algorithmic animations and emotional variations on refresh
 
+// Backend URL resolver: when running inside the Android APK (loaded via appassets.androidplatform.net or file:)
+// automatically target the live full-stack cloud backend for real-time proposals and cross-device syncing.
+const API_BASE_URL = (
+  window.location.origin.includes("appassets.androidplatform.net") ||
+  window.location.protocol === "file:" ||
+  (window.location.hostname === "localhost" && window.location.port === "5000")
+) ? "https://romantic-beige.vercel.app" : "";
+
+function getBackendOrigin() {
+  if (
+    window.location.origin.includes("appassets.androidplatform.net") ||
+    window.location.protocol === "file:"
+  ) {
+    return "https://romantic-beige.vercel.app";
+  }
+  return window.location.origin;
+}
+
 const canvas = document.getElementById("heartCanvas");
 const ctx = canvas.getContext("2d");
 
@@ -1455,7 +1473,7 @@ if (recipientAcceptForm) {
 
     try {
       if (activeProposalId) {
-        const res = await fetch(`/api/proposals/${activeProposalId}/accept`, {
+        const res = await fetch(`${API_BASE_URL}/api/proposals/${activeProposalId}/accept`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ replyNote })
@@ -1741,7 +1759,7 @@ async function handleCreateAndShareProposal() {
   showToast("💌 Crafting private proposal & real-time tracker...");
 
   try {
-    const res = await fetch("/api/proposals", {
+    const res = await fetch(`${API_BASE_URL}/api/proposals`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -1798,7 +1816,7 @@ function openShareModal(proposalId, sender, partner) {
     sharePartnerLabel.textContent = `Secret Proposal Link for ${partner}:`;
   }
 
-  const origin = window.location.origin;
+  const origin = getBackendOrigin();
   const partnerUrl = `${origin}/?p=${proposalId}&view=proposal`;
   const trackerUrl = `${origin}/?p=${proposalId}&view=tracker`;
 
@@ -1908,7 +1926,7 @@ function startTrackingProposal(proposalId) {
   // 1. SSE Connection
   if (window.EventSource) {
     try {
-      sseEventSource = new EventSource(`/api/proposals/${proposalId}/events`);
+      sseEventSource = new EventSource(`${API_BASE_URL}/api/proposals/${proposalId}/events`);
       sseEventSource.onmessage = (event) => {
         try {
           const data = JSON.parse(event.data);
@@ -1926,7 +1944,7 @@ function startTrackingProposal(proposalId) {
   // 2. Polling Fallback every 3 seconds
   proposalPollingTimer = setInterval(async () => {
     try {
-      const res = await fetch(`/api/proposals/${proposalId}`);
+      const res = await fetch(`${API_BASE_URL}/api/proposals/${proposalId}`);
       if (res.ok) {
         const data = await res.json();
         const prop = data.proposal || data;
@@ -2552,7 +2570,7 @@ async function initApp() {
   if (paramProposalId) {
     activeProposalId = paramProposalId;
     try {
-      const res = await fetch(`/api/proposals/${paramProposalId}`);
+      const res = await fetch(`${API_BASE_URL}/api/proposals/${paramProposalId}`);
       if (res.ok) {
         const proposal = await res.json();
         if (proposal) {

@@ -1,4 +1,4 @@
-name: Build Android APK
+name: Build Android APK & App Bundle (Play Store & Vivo Store)
 
 on:
   push:
@@ -21,19 +21,45 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
 
+      - name: Sync web assets into Android project
+        run: |
+          mkdir -p android/app/src/main/assets/icons
+          cp index.html style.css script.js manifest.json sw.js android/app/src/main/assets/
+          cp icons/* android/app/src/main/assets/icons/ || true
+
+      - name: Generate Release Signing Keystore
+        run: |
+          cd android/app
+          if [ ! -f release.keystore ]; then
+            keytool -genkey -v -keystore release.keystore -alias romantic -keyalg RSA -keysize 2048 -validity 10000 -storepass romantic123 -keypass romantic123 -dname "CN=Romantic Universe, OU=Mobile, O=Romantic, L=Dhaka, S=Dhaka, C=BD"
+          fi
+
       - name: Grant execute permission for gradlew
         run: |
           cd android
           gradle wrapper --gradle-version 8.5
           chmod +x gradlew || true
 
-      - name: Build Debug APK
+      - name: Build Signed Release APK & Play Store AAB
         run: |
           cd android
-          ./gradlew assembleDebug || gradle assembleDebug
+          ./gradlew assembleRelease bundleRelease assembleDebug || gradle assembleRelease bundleRelease assembleDebug
 
-      - name: Upload APK artifact
+      - name: Upload Release APK (Vivo Store, Xiaomi, Direct Install)
         uses: actions/upload-artifact@v4
         with:
-          name: romantic-universe-apk
+          name: Romantic-Universe-Release-APK
+          path: android/app/build/outputs/apk/release/*.apk
+
+      - name: Upload Google Play Store Bundle (.aab)
+        uses: actions/upload-artifact@v4
+        with:
+          name: Romantic-Universe-PlayStore-Bundle
+          path: android/app/build/outputs/bundle/release/*.aab
+
+      - name: Upload Debug APK (Instant Testing)
+        uses: actions/upload-artifact@v4
+        with:
+          name: Romantic-Universe-Debug-APK
           path: android/app/build/outputs/apk/debug/*.apk
+

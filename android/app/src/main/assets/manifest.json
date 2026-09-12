@@ -1,0 +1,39 @@
+{
+  "id": "/",
+  "name": "Romantic Universe & Love Proposal",
+  "short_name": "RomanticLove",
+  "description": "An interactive, personalized romantic love confession and proposal platform with live animations, music, and real-time proposal tracking.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#02030a",
+  "theme_color": "#ff2d5f",
+  "categories": ["lifestyle", "entertainment", "social"],
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-maskable-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
