@@ -1,11 +1,11 @@
--- Schema for Romantic Universe Proposals
--- Run this query in your Supabase SQL Editor (Dashboard -> SQL Editor -> New Query)
+-- Clean, robust schema for Romantic Universe Proposals
+-- Copy and paste this directly into the Supabase SQL Editor and click Run
 
 CREATE TABLE IF NOT EXISTS proposals (
     id TEXT PRIMARY KEY,
     sender TEXT NOT NULL,
     partner TEXT NOT NULL,
-    status TEXT NOT NULL DEFAULT 'pending', -- 'pending' (waiting) or 'accepted'
+    status TEXT NOT NULL DEFAULT 'pending',
     reply_note TEXT DEFAULT '',
     created_at TIMESTAMPTZ DEFAULT NOW(),
     accepted_at TIMESTAMPTZ,
@@ -17,27 +17,22 @@ CREATE TABLE IF NOT EXISTS proposals (
     touch_fx TEXT DEFAULT 'sparkles',
     custom_note TEXT DEFAULT '',
     custom_vow TEXT DEFAULT '',
-    payload JSONB -- Full configuration snapshot
+    payload JSONB
 );
 
 -- Enable Row Level Security (RLS)
 ALTER TABLE proposals ENABLE ROW LEVEL SECURITY;
 
--- Allow public read access to proposals by ID (for recipient and tracker)
-CREATE POLICY "Allow public read access to proposals" 
-ON proposals FOR SELECT 
-USING (true);
+-- Reset and configure public access policies
+DROP POLICY IF EXISTS "Allow public read access to proposals" ON proposals;
+CREATE POLICY "Allow public read access to proposals" ON proposals FOR SELECT USING (true);
 
--- Allow public insert access for creating proposals
-CREATE POLICY "Allow public insert access to proposals" 
-ON proposals FOR INSERT 
-WITH CHECK (true);
+DROP POLICY IF EXISTS "Allow public insert access to proposals" ON proposals;
+CREATE POLICY "Allow public insert access to proposals" ON proposals FOR INSERT WITH CHECK (true);
 
--- Allow public update access for accepting proposals
-CREATE POLICY "Allow public update access to proposals" 
-ON proposals FOR UPDATE 
-USING (true);
+DROP POLICY IF EXISTS "Allow public update access to proposals" ON proposals;
+CREATE POLICY "Allow public update access to proposals" ON proposals FOR UPDATE USING (true);
 
--- Index on created_at for fast admin/dashboard listing
+-- Performance indices
 CREATE INDEX IF NOT EXISTS idx_proposals_created_at ON proposals (created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_proposals_status ON proposals (status);
