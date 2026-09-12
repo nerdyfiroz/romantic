@@ -1817,7 +1817,7 @@ function openShareModal(proposalId, sender, partner) {
   }
 
   const origin = getBackendOrigin();
-  const partnerUrl = `${origin}/?p=${proposalId}&view=proposal`;
+  const partnerUrl = `${origin}/p/${proposalId}`;
   const trackerUrl = `${origin}/?p=${proposalId}&view=tracker`;
 
   if (partnerShareUrl) partnerShareUrl.value = partnerUrl;
@@ -2522,10 +2522,36 @@ function wrapText(ctx, text, x, y, maxWidth, lineHeight) {
 // Window resize listener
 window.addEventListener("resize", resize);
 
+// Helper to show romantic "Proposal Not Found" card
+function showProposalNotFoundState() {
+  const notFoundModal = document.getElementById("proposalNotFoundModal");
+  if (notFoundModal) {
+    notFoundModal.hidden = false;
+    const createBtn = document.getElementById("createFromNotFoundBtn");
+    if (createBtn) {
+      createBtn.onclick = () => {
+        notFoundModal.hidden = true;
+        window.location.href = window.location.origin;
+      };
+    }
+    const backdrop = document.getElementById("notFoundModalBackdrop");
+    if (backdrop) {
+      backdrop.onclick = () => {
+        notFoundModal.hidden = true;
+      };
+    }
+  }
+}
+
 // Initialization sequence
 async function initApp() {
   const urlParams = new URLSearchParams(window.location.search);
-  const paramProposalId = urlParams.get("p");
+  let paramProposalId = urlParams.get("p");
+  const pathMatch = window.location.pathname.match(/\/p\/([a-zA-Z0-9_-]+)/);
+  if (!paramProposalId && pathMatch) {
+    paramProposalId = pathMatch[1];
+  }
+
   const paramView = urlParams.get("view");
   const paramFrom = urlParams.get("from");
   const paramTo = urlParams.get("to");
@@ -2566,35 +2592,36 @@ async function initApp() {
     selectTouchFx.value = storedTouch;
   }
 
-  // Handle Shared Proposal Mode (?p=...)
+  // Handle Dynamic Proposal Mode (/p/:id or ?p=...)
   if (paramProposalId) {
     activeProposalId = paramProposalId;
     try {
       const res = await fetch(`${API_BASE_URL}/api/proposals/${paramProposalId}`);
       if (res.ok) {
-        const proposal = await res.json();
-        if (proposal) {
+        const data = await res.json();
+        const proposal = data.proposal || data;
+        if (proposal && proposal.id) {
           sender = proposal.sender || sender;
           partner = proposal.partner || partner;
           currentDynamic = proposal.dynamic || currentDynamic;
           selectedEmotionChoice = proposal.emotion || selectedEmotionChoice;
           currentCustomNote = proposal.customNote || "";
           if (proposal.motionMode) currentMotionMode = proposal.motionMode;
-          if (proposal.animSpeed) currentAnimSpeed = proposal.animSpeed;
+          if (proposal.animSpeed) currentAnimSpeed = parseFloat(proposal.animSpeed) || 1.0;
           if (proposal.particleDensity) currentParticleDensity = proposal.particleDensity;
           if (proposal.touchFx) currentTouchFx = proposal.touchFx;
 
-          // If view === 'proposal' (Recipient Mode)
-          if (paramView === "proposal" || !paramView) {
+          // If view !== 'tracker', this is Recipient Proposal View
+          if (paramView !== "tracker") {
             isRecipientProposalMode = true;
             document.body.classList.add("proposal-recipient-mode");
 
-            // If already accepted, reflect immediately
+            // If already accepted, reflect celebratory state immediately
             if (proposal.status === "accepted") {
               setTimeout(() => {
                 triggerCelebrationSequence(proposal.replyNote);
                 if (proposalButtonsGroup) proposalButtonsGroup.style.display = "none";
-              }, 500);
+              }, 400);
             }
           }
 
@@ -2608,10 +2635,15 @@ async function initApp() {
               }
             }, 600);
           }
+        } else {
+          showProposalNotFoundState();
         }
+      } else {
+        showProposalNotFoundState();
       }
     } catch (e) {
       console.warn("Could not fetch proposal details from server:", e);
+      showToast("⚠️ Could not reach server. Reconnecting...");
     }
   } else if (storedProposalId && !paramView) {
     // If sender already created an active proposal in their session, track it silently

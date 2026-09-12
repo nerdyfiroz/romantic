@@ -624,6 +624,27 @@
     </div>
   </div>
 
+  <!-- Modal for Proposal Not Found / Expired Link -->
+  <div id="proposalNotFoundModal" class="customizer-modal" hidden>
+    <div class="modal-backdrop" id="notFoundModalBackdrop"></div>
+    <div class="modal-card not-found-modal-card" role="dialog" aria-modal="true" aria-labelledby="notFoundModalTitle">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <span class="modal-heart-icon">💌</span>
+          <h3 id="notFoundModalTitle">Proposal Link Not Found</h3>
+        </div>
+      </div>
+      <p class="modal-desc" id="notFoundModalDesc" style="color: rgba(255, 255, 255, 0.88); line-height: 1.6; margin: 16px 0 24px;">
+        We couldn't find this romantic proposal. The link might have expired, or is not quite complete. Love is always worth creating anew!
+      </p>
+      <div class="modal-actions center-actions">
+        <button type="button" id="createFromNotFoundBtn" class="modal-submit-btn" style="min-width: 220px;">
+          ✨ Craft Your Romantic Proposal ❤️
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Toast for feedback notifications -->
   <div id="toastNotification" class="toast-notification" hidden role="status" aria-live="polite"></div>
 

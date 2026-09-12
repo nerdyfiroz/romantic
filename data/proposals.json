@@ -32,5 +32,39 @@
     "createdAt": "2026-09-12T19:28:44.775Z",
     "acceptedAt": "2026-09-12T19:28:48.601Z",
     "replyNote": "YES, a million times YES! Forever yours."
+  },
+  "love-1712d6a7d2e75423965966865c8b9be6": {
+    "id": "love-1712d6a7d2e75423965966865c8b9be6",
+    "sender": "Md. Firoz Kabir",
+    "partner": "Most. Noushin Islam",
+    "dynamic": "boy_to_girl",
+    "emotion": "rose",
+    "motionMode": "pulse",
+    "animSpeed": 1,
+    "particleDensity": "medium",
+    "touchFx": "sparkles",
+    "customNote": "I love you endlessly",
+    "customVow": "",
+    "status": "accepted",
+    "createdAt": "2026-09-12T20:21:29.057Z",
+    "acceptedAt": "2026-09-12T20:21:33.511Z",
+    "replyNote": "Yes Firoz ❤️"
+  },
+  "love-6ff0222531e3f603dcc6813b371b4f71": {
+    "id": "love-6ff0222531e3f603dcc6813b371b4f71",
+    "sender": "Md. Firoz Kabir",
+    "partner": "Most. Noushin Islam",
+    "dynamic": "boy_to_girl",
+    "emotion": "crimson",
+    "motionMode": "pulse",
+    "animSpeed": 1,
+    "particleDensity": "medium",
+    "touchFx": "sparkles",
+    "customNote": "",
+    "customVow": "",
+    "status": "accepted",
+    "createdAt": "2026-09-12T20:22:09.721Z",
+    "acceptedAt": "2026-09-12T20:22:11.504Z",
+    "replyNote": "Yes Firoz ❤️"
   }
 }
