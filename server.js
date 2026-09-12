@@ -51,8 +51,11 @@ function broadcastProposalUpdate(proposalId, data) {
   }
 }
 
+// Proposals API Router - mounted at both /api and root / for seamless Vercel / serverless routing
+const apiRouter = express.Router();
+
 // API: Create new romantic proposal
-app.post('/api/proposals', (req, res) => {
+apiRouter.post('/proposals', (req, res) => {
   const {
     sender,
     partner,
@@ -101,7 +104,7 @@ app.post('/api/proposals', (req, res) => {
 });
 
 // API: Get proposal by ID
-app.get('/api/proposals/:id', (req, res) => {
+apiRouter.get('/proposals/:id', (req, res) => {
   const proposal = proposals[req.params.id];
   if (!proposal) {
     return res.status(404).json({ error: 'Proposal not found' });
@@ -110,7 +113,7 @@ app.get('/api/proposals/:id', (req, res) => {
 });
 
 // API: Accept proposal (called when recipient says YES)
-app.post('/api/proposals/:id/accept', (req, res) => {
+apiRouter.post('/proposals/:id/accept', (req, res) => {
   const proposalId = req.params.id;
   const proposal = proposals[proposalId];
   if (!proposal) {
@@ -141,7 +144,7 @@ app.post('/api/proposals/:id/accept', (req, res) => {
 });
 
 // API: Real-time SSE stream for sender notification
-app.get('/api/proposals/:id/events', (req, res) => {
+apiRouter.get('/proposals/:id/events', (req, res) => {
   const proposalId = req.params.id;
   const proposal = proposals[proposalId];
 
@@ -173,7 +176,11 @@ app.get('/api/proposals/:id/events', (req, res) => {
   });
 });
 
-// Serve static frontend files with explicit no-cache for scripts/styles/html to prevent stale cached UI
+// Mount router under both /api and root
+app.use('/api', apiRouter);
+app.use(apiRouter);
+
+// Serve static frontend files with explicit no-cache for scripts/styles/html
 app.use(express.static(__dirname, {
   setHeaders: (res, filePath) => {
     if (filePath.endsWith('.html') || filePath.endsWith('.js') || filePath.endsWith('.css') || filePath.endsWith('sw.js')) {
@@ -182,7 +189,11 @@ app.use(express.static(__dirname, {
   }
 }));
 
+// Route non-asset URLs to index.html (never serve index.html for static assets)
 app.get('*', (req, res) => {
+  if (/\.(css|js|png|jpg|jpeg|svg|ico|json|webm|mp4|webp)$/i.test(req.path)) {
+    return res.status(404).send('Asset not found');
+  }
   res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
   res.sendFile(path.join(__dirname, 'index.html'));
 });
