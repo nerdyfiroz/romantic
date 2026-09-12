@@ -1,0 +1,36 @@
+{
+  "love-lzcrav": {
+    "id": "love-lzcrav",
+    "sender": "Sarah",
+    "partner": "Alex",
+    "dynamic": "girl_to_boy",
+    "emotion": "rose",
+    "motionMode": "pulse",
+    "animSpeed": 1,
+    "particleDensity": "medium",
+    "touchFx": "sparkles",
+    "customNote": "",
+    "customVow": "",
+    "status": "accepted",
+    "createdAt": "2026-09-12T19:24:27.300Z",
+    "acceptedAt": "2026-09-12T19:24:29.005Z",
+    "replyNote": "I love you so much Sarah! YES!"
+  },
+  "love-t6n9ks": {
+    "id": "love-t6n9ks",
+    "sender": "Ayesha",
+    "partner": "Farhan",
+    "dynamic": "girl_to_boy",
+    "emotion": "rose",
+    "motionMode": "pulse",
+    "animSpeed": 1,
+    "particleDensity": "medium",
+    "touchFx": "sparkles",
+    "customNote": "You make every second magical.",
+    "customVow": "",
+    "status": "accepted",
+    "createdAt": "2026-09-12T19:28:44.775Z",
+    "acceptedAt": "2026-09-12T19:28:48.601Z",
+    "replyNote": "YES, a million times YES! Forever yours."
+  }
+}

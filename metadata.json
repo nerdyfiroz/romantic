@@ -1,0 +1,8 @@
+{
+  "name": "For Most. Noushin Islam — From Md. Firoz Kabir ❤️",
+  "description": "An interactive, personalized romantic love confession and proposal experience where couples can enter their names to generate customized animations, emotions, love letters, and dynamic visual worlds that evolve on every refresh.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

@@ -5,92 +5,628 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#02030a" />
   <title>For Most. Noushin Islam — From Md. Firoz Kabir ❤️</title>
+  <meta name="description" content="An emotional and romantic animated love confession and proposal for Most. Noushin Islam from Md. Firoz Kabir, featuring glowing particle hearts, love letters, and interactive celebrations." />
+  <meta property="og:title" content="For Most. Noushin Islam — From Md. Firoz Kabir ❤️" />
+  <meta property="og:description" content="An emotional and romantic animated love confession and proposal for Most. Noushin Islam from Md. Firoz Kabir, featuring glowing particle hearts, love letters, and interactive celebrations." />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="manifest" href="/manifest.json" />
+  <link rel="apple-touch-icon" href="/icons/icon-192.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=3" />
+  <script>
+    function dismissSenderAlertImmediate(e) {
+      if (e) {
+        try { if (e.stopPropagation) e.stopPropagation(); } catch(_) {}
+      }
+      var alertElem = document.getElementById("senderAcceptedAlert");
+      if (alertElem) {
+        alertElem.style.setProperty("display", "none", "important");
+        alertElem.style.setProperty("visibility", "hidden", "important");
+        alertElem.style.setProperty("opacity", "0", "important");
+        alertElem.style.setProperty("pointer-events", "none", "important");
+        alertElem.hidden = true;
+        alertElem.classList.add("is-hidden");
+      }
+      if (typeof window.dismissSenderAcceptedAlert === "function") {
+        window.dismissSenderAcceptedAlert(e);
+      }
+    }
+  </script>
 </head>
 <body>
+  <div id="confettiContainer" class="confetti-container" aria-hidden="true"></div>
+
+  <!-- Top Personalization & Emotion Control Bar -->
+  <header class="top-nav-bar" id="topNavBar">
+    <div class="nav-container">
+      <div class="nav-theme-info">
+        <span class="theme-tag-pill" id="themeTagPill">🌹 Passionate Rose Bloom</span>
+        <span class="nav-couple-text" id="navCoupleText">Md. Firoz Kabir &amp; Most. Noushin Islam</span>
+      </div>
+      <div class="nav-actions">
+        <button type="button" id="installPwaBtn" class="nav-action-btn install-app-btn" title="Install as Android App on your home screen">
+          <span class="btn-icon">📱</span>
+          <span class="btn-text">Install App</span>
+        </button>
+        <button type="button" id="refreshEmotionBtn" class="nav-action-btn refresh-btn" title="Refresh to reveal a new romantic emotion and animation">
+          <span class="btn-icon">↻</span>
+          <span class="btn-text">Surprise Emotion</span>
+        </button>
+        <button type="button" id="openCustomizerBtn" class="nav-action-btn customize-btn" title="Personalize names, girl/boy proposal role, and vows">
+          <span class="btn-icon">✏️</span>
+          <span class="btn-text">Put Your Names</span>
+        </button>
+        <button type="button" id="downloadModalBtn" class="nav-action-btn download-btn" title="Download video animation or keepsake image">
+          <span class="btn-icon">⬇️</span>
+          <span class="btn-text">Download</span>
+        </button>
+        <button type="button" id="shareBtn" class="nav-action-btn share-btn" title="Create and share proposal link with live acceptance notification">
+          <span class="btn-icon">💌</span>
+          <span class="btn-text">Share Proposal</span>
+        </button>
+      </div>
+    </div>
+    <!-- Special banner shown when viewed as a recipient proposal -->
+    <div id="proposalModeBanner" class="proposal-mode-banner" hidden>
+      <div class="banner-inner">
+        <span class="banner-icon">💌</span>
+        <span id="proposalBannerText">A Private Heartfelt Proposal for You</span>
+        <span class="banner-badge" id="proposalBannerBadge">Special Delivery</span>
+      </div>
+    </div>
+  </header>
+
   <main class="page">
 
     <header class="hero">
-      <div class="tiny-heart">♡</div>
-      <h1>I coded this one<br><span>just for you</span> ♡</h1>
-      <div class="side-note left">with a little<br>bit of magic ♡</div>
-      <div class="side-note right">for you,<br>always ♡</div>
+      <div class="tiny-heart" id="heroHeart">♡</div>
+      <h1 id="heroHeadline">Every beat of my heart<br><span id="heroPartnerName">belongs to you, Noushin</span> ♡</h1>
+      <div class="side-note left" id="heroNoteLeft">with all my soul<br>&amp; devotion ♡</div>
+      <div class="side-note right" id="heroNoteRight">for you, always<br>&amp; forever ♡</div>
+      <div class="sound-control-wrapper">
+        <button id="soundToggle" class="sound-toggle-btn" type="button" aria-label="Toggle romantic music chimes">
+          <span id="soundIcon">♪</span> <span id="soundLabel">Play Romantic Melody</span>
+        </button>
+      </div>
     </header>
 
-    <section class="stage" aria-label="Animated proposal">
+    <section class="stage" aria-label="Glowing Heart of Love" id="stageSection">
       <canvas id="heartCanvas"></canvas>
 
       <div class="heart-message" id="heartMessage">
-        <span class="small">my</span>
-        <strong>favorite</strong>
-        <span class="small">person</span>
+        <span class="small" id="heartMessagePrefix">my forever</span>
+        <strong id="heartMessageName">Noushin</strong>
+        <span class="subtext" id="heartMessageSub">my greatest blessing</span>
       </div>
 
-      <div class="floating-heart one">♡</div>
-      <div class="floating-heart two">♥</div>
-      <div class="floating-heart three">♡</div>
+      <button type="button" class="floating-heart one" id="floatHeart1" aria-label="Sweet Heart">♡</button>
+      <button type="button" class="floating-heart two" id="floatHeart2" aria-label="Loving Heart">♥</button>
+      <button type="button" class="floating-heart three" id="floatHeart3" aria-label="Sparkling Heart">♡</button>
     </section>
 
-    <div class="comment-bar">
-      <span class="bubble">◯</span>
-      <span>COMMENT</span>
-      <b>"AWESOME"</b>
-      <span class="arrow">↓</span>
-      <small>if you still love the code ♡</small>
+    <!-- Animation Studio & Interactive Controls Deck -->
+    <div class="animation-deck" id="animationDeck" aria-label="Animation Studio Options">
+      <div class="deck-header">
+        <div class="deck-title-group">
+          <span class="deck-icon">✨</span>
+          <div class="deck-text">
+            <strong>Romantic Animation Studio</strong>
+            <span class="deck-desc">Select from 12 enchanted animation worlds &amp; motion physics</span>
+          </div>
+        </div>
+        <div class="deck-quick-actions">
+          <button type="button" id="recordVideoBtn" class="deck-btn record-btn" title="Record and download animation video (.webm)">
+            <span class="deck-btn-icon">🎥</span>
+            <span id="recordVideoBtnLabel">Save Video</span>
+          </button>
+          <button type="button" id="downloadCardBtn" class="deck-btn card-btn" title="Download romantic keepsake card (.png)">
+            <span class="deck-btn-icon">📸</span>
+            <span>Save Keepsake</span>
+          </button>
+          <button type="button" id="randomAnimBtn" class="deck-btn random-btn" title="Surprise me with a random animation style">
+            <span class="deck-btn-icon">🎲</span>
+            <span>Random</span>
+          </button>
+          <button type="button" id="replayAnimBtn" class="deck-btn replay-btn" title="Replay heart reveal animation">
+            <span class="deck-btn-icon">↺</span>
+            <span>Replay</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Quick Animation Selector Chips (12 styles) -->
+      <div class="anim-chips-container" id="animChipsContainer" role="tablist" aria-label="Animation Themes">
+        <button type="button" class="anim-chip active" data-anim="rose" id="chip-rose">
+          <span class="chip-icon">🌹</span>
+          <span class="chip-label">Rose Bloom</span>
+        </button>
+        <button type="button" class="anim-chip" data-anim="starlight" id="chip-starlight">
+          <span class="chip-icon">✨</span>
+          <span class="chip-label">Constellation</span>
+        </button>
+        <button type="button" class="anim-chip" data-anim="embers" id="chip-embers">
+          <span class="chip-icon">🔥</span>
+          <span class="chip-label">Fiery Embers</span>
+        </button>
+        <button type="button" class="anim-chip" data-anim="aurora" id="chip-aurora">
+          <span class="chip-icon">🌌</span>
+          <span class="chip-label">Aurora Lights</span>
+        </button>
+        <button type="button" class="anim-chip" data-anim="butterfly" id="chip-butterfly">
+          <span class="chip-icon">🦋</span>
+          <span class="chip-label">Butterflies</span>
+        </button>
+        <button type="button" class="anim-chip" data-anim="crystal" id="chip-crystal">
+          <span class="chip-icon">💎</span>
+          <span class="chip-label">Diamond Prism</span>
+        </button>
+        <button type="button" class="anim-chip" data-anim="fireworks" id="chip-fireworks">
+          <span class="chip-icon">🎆</span>
+          <span class="chip-label">Sparklers</span>
+        </button>
+        <button type="button" class="anim-chip" data-anim="supernova" id="chip-supernova">
+          <span class="chip-icon">💫</span>
+          <span class="chip-label">Supernova</span>
+        </button>
+        <button type="button" class="anim-chip" data-anim="sakura" id="chip-sakura">
+          <span class="chip-icon">🌸</span>
+          <span class="chip-label">Sakura Petals</span>
+        </button>
+        <button type="button" class="anim-chip" data-anim="ocean" id="chip-ocean">
+          <span class="chip-icon">🌊</span>
+          <span class="chip-label">Ocean Waves</span>
+        </button>
+        <button type="button" class="anim-chip" data-anim="sunset" id="chip-sunset">
+          <span class="chip-icon">🍯</span>
+          <span class="chip-label">Sunset Serenade</span>
+        </button>
+        <button type="button" class="anim-chip" data-anim="sanctuary" id="chip-sanctuary">
+          <span class="chip-icon">🕊️</span>
+          <span class="chip-label">Pure Sanctuary</span>
+        </button>
+      </div>
+
+      <!-- Animation Fine-Tuning Deck -->
+      <div class="anim-tweaks-grid">
+        <div class="tweak-item">
+          <label for="selectMotionMode">Motion Dynamics</label>
+          <div class="tweak-select-wrap">
+            <select id="selectMotionMode" class="tweak-select">
+              <option value="pulse">💓 Heartbeat Pulse</option>
+              <option value="vortex">🌀 Spiral Vortex</option>
+              <option value="wave">🌊 Ocean Waves</option>
+              <option value="shimmer">✨ Starlight Shimmer</option>
+              <option value="wings">🦋 Wing Flutters</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="tweak-item">
+          <label for="selectAnimSpeed">Tempo &amp; Speed</label>
+          <div class="tweak-select-wrap">
+            <select id="selectAnimSpeed" class="tweak-select">
+              <option value="0.65">🌙 Gentle &amp; Dreamy (0.6x)</option>
+              <option value="1.0" selected>💖 Romantic Pace (1.0x)</option>
+              <option value="1.55">⚡ Passionate Rush (1.5x)</option>
+              <option value="2.1">🔥 Electric Flutter (2.0x)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="tweak-item">
+          <label for="selectParticleDensity">Particle Density</label>
+          <div class="tweak-select-wrap">
+            <select id="selectParticleDensity" class="tweak-select">
+              <option value="light">🌿 Soft Glow (600)</option>
+              <option value="medium" selected>💖 Lush &amp; Radiant (1,100)</option>
+              <option value="high">🌟 Supernova Starfield (1,800)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="tweak-item">
+          <label for="selectTouchFx">Interactive Cursor / Touch</label>
+          <div class="tweak-select-wrap">
+            <select id="selectTouchFx" class="tweak-select">
+              <option value="sparkles" selected>✨ Stardust Sparkles</option>
+              <option value="hearts">💖 Floating Mini Hearts</option>
+              <option value="petals">🌸 Drifting Petals</option>
+              <option value="embers">🔥 Crackling Embers</option>
+              <option value="rainbow">🌈 Prismatic Rays</option>
+            </select>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <section class="code-window">
-      <div class="window-top">
-        <div class="dots"><i></i><i></i><i></i></div>
-        <span>love.js</span>
-        <span class="window-symbol">⌘</span>
+    <div class="comment-bar love-whisper-bar">
+      <span class="bubble" id="whisperBubble">✨</span>
+      <span id="whisperPrefix">A PROMISE TO</span>
+      <b id="whisperPartner">NOUSHIN</b>
+      <span class="arrow">♡</span>
+      <small id="whisperFrom">from Firoz's soul straight to yours ♡</small>
+    </div>
+
+    <section class="love-letter-card" id="loveLetter">
+      <div class="letter-top">
+        <div class="letter-seal">
+          <span class="seal-icon" id="letterSealIcon">💌</span>
+          <span class="seal-text" id="letterSealText">A Love Letter to Noushin</span>
+        </div>
+        <span class="letter-tag" id="letterThemeTag">passionate &amp; eternal</span>
       </div>
 
-      <div class="code-body">
-        <div class="line"><em>01</em><span><code class="purple">const</code> <code class="white">love</code> <code class="pink">=</code> <code class="green">true</code>;</span></div>
-        <div class="line"><em>02</em><span><code class="purple">const</code> <code class="white">name</code> <code class="pink">=</code> <code class="orange">"Most. Noushin Islam"</code>;</span></div>
-        <div class="line"><em>03</em><span></span></div>
-        <div class="line"><em>04</em><span><code class="purple">function</code> <code class="blue">myHeart</code>() {</span></div>
-        <div class="line"><em>05</em><span>&nbsp;&nbsp;<code class="purple">return</code> <code class="orange">`You + Me`</code>;</span></div>
-        <div class="line"><em>06</em><span>}</span></div>
-        <div class="line"><em>07</em><span></span></div>
-        <div class="line"><em>08</em><span><code class="purple">if</code> (<code class="white">love</code>) {</span></div>
-        <div class="line"><em>09</em><span>&nbsp;&nbsp;<code class="blue">console</code>.log(<code class="orange">"I choose you, Noushin."</code>);</span></div>
-        <div class="line"><em>10</em><span>&nbsp;&nbsp;<code class="blue">console</code>.log(<code class="orange">"Firoz + Noushin. Today. Tomorrow. Always."</code>);</span></div>
-        <div class="line"><em>11</em><span>}</span></div>
-        <div class="line"><em>12</em><span></span></div>
-        <div class="line"><em>13</em><span><code class="comment">// no bugs, just butterflies ♡</code></span></div>
+      <div class="letter-body">
+        <p class="letter-salutation" id="letterSalutation">My Dearest Most. Noushin Islam,</p>
+        <p class="letter-para" id="letterPara1">
+          In a universe of eight billion souls and infinite possibilities, my heart stops only for you.
+          You are the serene calm to my chaotic days, the sweetest melody in my quietest hours, and the brightest dream I never want to wake from.
+        </p>
+        <p class="letter-para" id="letterPara2">
+          Loving you isn’t something I have to think about—it is as essential and natural as breathing. With every beat of my heart, I choose you: your radiant smile that lights up my whole world, your gentle kindness that heals everything around you, and the boundless purity of your soul.
+        </p>
+        <p class="letter-para highlight" id="letterHighlight">
+          "Today, tomorrow, and through all of eternity... it has always been you, Noushin."
+        </p>
+        <div class="letter-signoff">
+          <span>With all my love and endless devotion,</span>
+          <strong id="letterSenderName">Md. Firoz Kabir ♡</strong>
+        </div>
       </div>
 
-      <div class="handwritten">built with love ♡</div>
+      <div class="love-capsules-header">
+        <span id="capsulesHeading">Three promises from my heart to yours ♡</span>
+      </div>
+      <div class="love-capsules" id="loveCapsulesContainer">
+        <button type="button" class="capsule-btn" id="capsule1" aria-label="Promise 1">
+          <span class="capsule-icon" id="capsuleIcon1">🌸</span>
+          <span class="capsule-title" id="capsuleTitle1">Your Radiant Smile</span>
+          <span class="capsule-detail" id="capsuleDetail1">No matter what happens, I promise to protect your happiness and cherish your beautiful smile.</span>
+        </button>
+        <button type="button" class="capsule-btn" id="capsule2" aria-label="Promise 2">
+          <span class="capsule-icon" id="capsuleIcon2">✨</span>
+          <span class="capsule-title" id="capsuleTitle2">A Safe Sanctuary</span>
+          <span class="capsule-detail" id="capsuleDetail2">My arms will always be your safe haven, where you are deeply heard, understood, and adored.</span>
+        </button>
+        <button type="button" class="capsule-btn" id="capsule3" aria-label="Promise 3">
+          <span class="capsule-icon" id="capsuleIcon3">🌙</span>
+          <span class="capsule-title" id="capsuleTitle3">Our Endless Tomorrow</span>
+          <span class="capsule-detail" id="capsuleDetail3">Hand in hand through every joy and storm, writing our happiest chapters together forever.</span>
+        </button>
+      </div>
+
+      <div class="handwritten-note" id="handwrittenNote">written with all my love ♡</div>
     </section>
 
     <section class="proposal" id="proposal">
-      <p class="proposal-small">from Md. Firoz Kabir, with all my heart...</p>
-      <div style="font-family:'Caveat',cursive;font-size:22px;color:#b7b9c8;margin-bottom:8px;">
-        Md. Firoz Kabir&nbsp; ♡ &nbsp;Most. Noushin Islam
+      <p class="proposal-small" id="proposalSmallText">from Md. Firoz Kabir, with all my heart and soul...</p>
+      <div class="couple-names" id="coupleNamesDisplay">
+        <span id="displaySender">Md. Firoz Kabir</span> &nbsp; <span class="heart-pulse" id="pulseHeartIcon">❤️</span> &nbsp; <span id="displayPartner">Most. Noushin Islam</span>
       </div>
-      <h2>Will you be<br><span>mine?</span> ♡</h2>
-      <p class="proposal-text">I could write a thousand lines of code,<br>but my forever one will always be <b>us</b>.</p>
+      <h2 id="proposalQuestion">Will you be<br><span id="proposalQuestionHighlight">mine forever?</span> ♡</h2>
+      <p class="proposal-text" id="proposalPoeticText">I could search a thousand lifetimes across a million galaxies,<br>but my heart's only true destination will always be <b>you</b>.</p>
 
-      <div class="buttons">
-        <button id="yesBtn" class="yes">YES, OF COURSE ♡</button>
-        <button id="againBtn" class="again">RUN IT AGAIN ↻</button>
+      <div class="buttons" id="proposalButtonsGroup">
+        <button id="yesBtn" class="yes" type="button" aria-label="Say yes to the proposal">YES, WITH ALL MY HEART! ❤️</button>
+        <button id="thinkBtn" class="think-btn" type="button" aria-label="Playfully hesitate">Let me think... 🤔</button>
+        <button id="againBtn" class="again" type="button" aria-label="Replay the romantic heart animation">FEEL THE MAGIC AGAIN ✨</button>
       </div>
+      <div id="playfulHesitationText" class="playful-hesitation-text" hidden></div>
 
       <div id="success" class="success" hidden>
-        <div class="success-heart">♥</div>
-        <h3>It's a YES! ❤️</h3>
-        <p>Then let's write the rest of our story together.</p>
+        <div class="success-heart" id="successHeartIcon">💖</div>
+        <h3 id="successHeading">YES! FOREVER &amp; ALWAYS! ❤️</h3>
+        <p class="success-highlight" id="successHighlight">"You and me, Noushin — a love written in the stars."</p>
+        <p class="success-vow" id="successVow">Thank you for making me the happiest person in the universe! From this second until the end of time, I promise to love you, respect you, and hold you close through every step of life.</p>
+        <div id="recipientReplyShowcase" class="recipient-reply-showcase" hidden>
+          <span class="reply-label">Your message of love:</span>
+          <p id="recipientReplyText" class="reply-quote"></p>
+        </div>
+        <div class="success-badges" id="successBadges">
+          <span class="badge">💍 Bound by Love</span>
+          <span class="badge">🌹 Two Hearts as One</span>
+          <span class="badge">♾️ Eternity Starts Now</span>
+        </div>
+        <div class="success-post-actions">
+          <button type="button" id="downloadCertificateBtn" class="deck-btn cert-download-btn">
+            <span class="deck-btn-icon">📜</span>
+            <span>Download Official Love Certificate</span>
+          </button>
+          <a id="notifyWhatsAppBtn" target="_blank" rel="noopener noreferrer" class="deck-btn notify-wa-btn" hidden>
+            <span class="deck-btn-icon">📲</span>
+            <span>Text "I Said YES! ❤️" on WhatsApp</span>
+          </a>
+        </div>
       </div>
     </section>
 
-    <footer>made with <span>♥</span> &amp; a little JavaScript</footer>
+    <footer id="pageFooter">made with eternal <span>♥</span> &amp; infinite devotion for Most. Noushin Islam from Md. Firoz Kabir</footer>
   </main>
 
-  <script src="script.js"></script>
+  <!-- Modal for customizing names, role dynamic, and emotion -->
+  <div id="customizerModal" class="customizer-modal" hidden>
+    <div class="modal-backdrop" id="modalBackdrop"></div>
+    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <span class="modal-heart-icon">💖</span>
+          <h3 id="modalTitle">Personalize Your Proposal &amp; Love Story</h3>
+        </div>
+        <button type="button" id="closeModalBtn" class="close-modal-btn" aria-label="Close modal">✕</button>
+      </div>
+      <p class="modal-desc">Craft a personalized confession. Girls can propose to their boys, boys to their girls, or soulmates together! The entire universe, animations, vows, and letter adapt to you both.</p>
+
+      <form id="namesForm" class="names-form">
+        <!-- Relationship Dynamic Selector (Girls can propose too!) -->
+        <div class="form-group">
+          <label>Who is Proposing?</label>
+          <div class="dynamic-picker-grid" role="radiogroup" aria-label="Proposal Dynamic">
+            <label class="dynamic-option">
+              <input type="radio" name="proposalDynamic" value="girl_to_boy" id="dynamicGirlToBoy" />
+              <div class="dynamic-card">
+                <span class="dynamic-icon">👸➡️🤴</span>
+                <span class="dynamic-title">Girl to Boy</span>
+                <span class="dynamic-sub">Girl proposing to her man/boyfriend</span>
+              </div>
+            </label>
+            <label class="dynamic-option">
+              <input type="radio" name="proposalDynamic" value="boy_to_girl" id="dynamicBoyToGirl" checked />
+              <div class="dynamic-card">
+                <span class="dynamic-icon">🤴➡️👸</span>
+                <span class="dynamic-title">Boy to Girl</span>
+                <span class="dynamic-sub">Boy proposing to his queen/girlfriend</span>
+              </div>
+            </label>
+            <label class="dynamic-option">
+              <input type="radio" name="proposalDynamic" value="soulmates" id="dynamicSoulmates" />
+              <div class="dynamic-card">
+                <span class="dynamic-icon">💖✨</span>
+                <span class="dynamic-title">Soulmates</span>
+                <span class="dynamic-sub">Two eternal souls bound in love</span>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label for="inputSender" id="labelSender">Your Name (Proposer)</label>
+            <input type="text" id="inputSender" placeholder="e.g. Md. Firoz Kabir" maxlength="40" required autocomplete="name" />
+          </div>
+          <div class="form-group">
+            <label for="inputPartner" id="labelPartner">Partner's Name (To Be Proposed To)</label>
+            <input type="text" id="inputPartner" placeholder="e.g. Most. Noushin Islam" maxlength="40" required autocomplete="off" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="selectEmotion">Romantic Emotion &amp; Animation Theme</label>
+          <select id="selectEmotion" class="emotion-select">
+            <option value="auto">✨ Surprise Engine (Fresh emotion on every refresh)</option>
+            <option value="rose">🌹 Passionate Rose Bloom (Ruby Fire &amp; Deep Lub-Dub Pulse)</option>
+            <option value="starlight">✨ Eternal Constellation (Cosmic Stardust &amp; Celestial Aurora)</option>
+            <option value="embers">🔥 Fiery Hearth Embers (Crackling Sparks &amp; Unquenchable Warmth)</option>
+            <option value="aurora">🌌 Northern Lights Aurora (Emerald &amp; Violet Undulating Curtains)</option>
+            <option value="butterfly">🦋 Fluttering Butterfly Dance (Whimsical Wing Beats &amp; Garden Glow)</option>
+            <option value="crystal">💎 Diamond Prism Crystalline (Faceted Glints &amp; Prismatic Rays)</option>
+            <option value="fireworks">🎆 Golden Sparkler Fountain (Celebratory Cascades &amp; Roman Candles)</option>
+            <option value="supernova">💫 Cosmic Supernova Bloom (Pulsating Star Core &amp; Nebula Rings)</option>
+            <option value="sakura">🌸 Cherry Blossom Reverie (Sakura Petals &amp; Soft Breeze)</option>
+            <option value="ocean">🌊 Deep Ocean Whispers (Sapphire Waves &amp; Moonlit Tides)</option>
+            <option value="sunset">🍯 Sunset Golden Serenade (Honey Glow &amp; Fluttering Blossoms)</option>
+            <option value="sanctuary">🕊️ Pure Sanctuary (Ethereal Opal &amp; Angelic Vortex)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="inputCustomNote">Special Personal Vow / Sweet Note (Optional)</label>
+          <textarea id="inputCustomNote" class="custom-note-input" rows="2" placeholder="Write a special private sentence from your heart to appear in the letter..."></textarea>
+        </div>
+
+        <div class="modal-actions">
+          <button type="submit" class="modal-submit-btn" id="saveStoryBtn">Apply Preview Here ✨</button>
+          <button type="button" class="modal-submit-btn secondary" id="createAndShareBtn">Generate Shareable Link 💌</button>
+          <button type="button" id="cancelModalBtn" class="modal-cancel-btn">Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal for Sharing Secret Proposal & Live Tracker -->
+  <div id="shareModal" class="customizer-modal" hidden>
+    <div class="modal-backdrop" id="shareModalBackdrop"></div>
+    <div class="modal-card share-modal-card" role="dialog" aria-modal="true" aria-labelledby="shareModalTitle">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <span class="modal-heart-icon">💌</span>
+          <h3 id="shareModalTitle">Share Secret Proposal &amp; Track Answer</h3>
+        </div>
+        <button type="button" id="closeShareModalBtn" class="close-modal-btn" aria-label="Close share modal">✕</button>
+      </div>
+
+      <div class="share-flow-container">
+        <!-- Step 1: Link for the partner -->
+        <div class="share-box partner-link-box">
+          <div class="share-box-header">
+            <span class="box-badge">For Your Partner</span>
+            <strong id="sharePartnerLabel">Secret Proposal Link for Partner</strong>
+          </div>
+          <p class="share-box-desc">When your partner opens this link, they will <strong>ONLY see your romantic proposal</strong> and the interactive question to accept. All creator toolbars and animation settings are hidden!</p>
+          <div class="share-input-row">
+            <input type="text" id="partnerShareUrl" class="share-url-input" readonly />
+            <button type="button" id="copyPartnerUrlBtn" class="copy-url-btn">📋 Copy Link</button>
+          </div>
+          <div class="social-share-actions">
+            <a id="shareWhatsAppBtn" target="_blank" rel="noopener noreferrer" class="social-btn whatsapp-btn">
+              <span>💬 Send on WhatsApp</span>
+            </a>
+            <a id="shareTelegramBtn" target="_blank" rel="noopener noreferrer" class="social-btn telegram-btn">
+              <span>✈️ Telegram</span>
+            </a>
+            <button type="button" id="nativeShareBtn" class="social-btn native-btn">
+              <span>📱 Share via Phone...</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Step 2: Live Status & Tracker for the sender -->
+        <div class="share-box tracker-box">
+          <div class="share-box-header">
+            <span class="box-badge tracker-badge">Live Answer Tracker</span>
+            <strong>Real-Time Acceptance Radar</strong>
+          </div>
+          <div class="tracker-status-row">
+            <div class="radar-indicator" id="radarIndicator">
+              <span class="radar-dot"></span>
+              <span class="radar-wave"></span>
+            </div>
+            <div class="tracker-status-text">
+              <span class="status-title" id="trackerStatusTitle">Waiting for Partner to Respond...</span>
+              <span class="status-desc" id="trackerStatusDesc">Keep this page open or bookmark your tracker link below. As soon as they click "YES", your screen will celebrate!</span>
+            </div>
+          </div>
+          <div class="share-input-row tracker-input-row">
+            <input type="text" id="senderTrackerUrl" class="share-url-input" readonly />
+            <button type="button" id="copyTrackerUrlBtn" class="copy-url-btn secondary">📋 Copy My Tracker</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-actions center-actions">
+        <button type="button" id="doneShareModalBtn" class="modal-submit-btn">Done &amp; Keep Watching 💖</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal for Recipient when clicking YES (to add a sweet reply message) -->
+  <div id="recipientAcceptModal" class="customizer-modal" hidden>
+    <div class="modal-backdrop" id="recipientModalBackdrop"></div>
+    <div class="modal-card accept-modal-card" role="dialog" aria-modal="true" aria-labelledby="acceptModalTitle">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <span class="modal-heart-icon">💍</span>
+          <h3 id="acceptModalTitle">Saying YES to Forever!</h3>
+        </div>
+        <button type="button" id="closeRecipientModalBtn" class="close-modal-btn" aria-label="Close modal">✕</button>
+      </div>
+      <p class="modal-desc" id="acceptModalDesc">You are about to make them the happiest person in the universe! Send a sweet reply back (they will be notified instantly on their screen):</p>
+
+      <form id="recipientAcceptForm">
+        <div class="form-group">
+          <label for="recipientReplyInput">Your Sweet Reply Note (Optional)</label>
+          <textarea id="recipientReplyInput" class="custom-note-input reply-textarea" rows="3" placeholder="e.g. Yes! A million times YES! I love you with all my heart and can't wait for forever with you! 🥰"></textarea>
+        </div>
+        <div class="modal-actions">
+          <button type="submit" class="modal-submit-btn confirm-yes-btn" id="confirmYesSubmitBtn">💖 Confirm &amp; Send My YES! 💍</button>
+          <button type="button" id="cancelRecipientAcceptBtn" class="modal-cancel-btn">Back</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Fullscreen Alert Overlay when Sender receives Acceptance -->
+  <div id="senderAcceptedAlert" class="sender-accepted-overlay" hidden role="dialog" aria-modal="true">
+    <div class="alert-backdrop" id="senderAlertBackdrop" onclick="dismissSenderAlertImmediate(event);" ontouchend="dismissSenderAlertImmediate(event);"></div>
+    <div class="alert-card">
+      <button type="button" id="dismissSenderAlertXBtn" class="alert-close-x-btn" aria-label="Close dialog" onclick="dismissSenderAlertImmediate(event);" ontouchend="dismissSenderAlertImmediate(event);">✕</button>
+      <div class="alert-fireworks-header">
+        <span class="big-sparkle">🎆</span>
+        <span class="big-heart">💖</span>
+        <span class="big-sparkle">🎆</span>
+      </div>
+      <h2 id="senderAlertHeading">🎉 SHE / HE SAID YES! ❤️</h2>
+      <p class="alert-sub" id="senderAlertPartnerName">Your proposal was joyfully accepted!</p>
+      <div class="alert-time-badge" id="senderAlertTimeBadge">Just now</div>
+
+      <div class="partner-reply-bubble" id="partnerReplyBubble" hidden>
+        <span class="reply-bubble-label">Their message to you:</span>
+        <p id="partnerReplyQuote" class="reply-quote-text"></p>
+      </div>
+
+      <p class="alert-congrats">May your love burn brighter and deeper with each passing day. Your eternal journey starts now!</p>
+
+      <div class="alert-actions">
+        <button type="button" id="senderSaveCertificateBtn" class="modal-submit-btn">
+          <span>📜 Save Official Love Certificate</span>
+        </button>
+        <button type="button" id="closeSenderAlertBtn" class="modal-cancel-btn" onclick="dismissSenderAlertImmediate(event);" ontouchend="dismissSenderAlertImmediate(event);">
+          <span>Close &amp; Celebrate 🥂</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal for Downloading Animation & Keepsakes -->
+  <div id="downloadModal" class="customizer-modal" hidden>
+    <div class="modal-backdrop" id="downloadModalBackdrop"></div>
+    <div class="modal-card download-modal-card" role="dialog" aria-modal="true" aria-labelledby="downloadModalTitle">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <span class="modal-heart-icon">⬇️</span>
+          <h3 id="downloadModalTitle">Download Animations &amp; Keepsakes</h3>
+        </div>
+        <button type="button" id="closeDownloadModalBtn" class="close-modal-btn" aria-label="Close modal">✕</button>
+      </div>
+      <p class="modal-desc">Save high-definition memories of your romantic animation, glowing heart, and eternal confession.</p>
+
+      <div class="download-options-grid">
+        <!-- Option 1: Record Animation Video -->
+        <div class="download-card">
+          <div class="download-card-icon">🎥</div>
+          <div class="download-card-info">
+            <strong>Record Animation Video (.webm)</strong>
+            <span>Records a 5-second ultra-smooth loop of the glowing particle heart and romantic chimes.</span>
+          </div>
+          <button type="button" id="startVideoRecordBtn" class="deck-btn record-action-btn">
+            <span class="deck-btn-icon">⏺️</span>
+            <span id="startVideoRecordText">Record 5s Video</span>
+          </button>
+          <div id="recordProgressBar" class="record-progress-bar" hidden>
+            <div id="recordProgressFill" class="record-progress-fill"></div>
+            <span id="recordProgressText" class="record-progress-text">Recording 0%</span>
+          </div>
+        </div>
+
+        <!-- Option 2: HD Keepsake Card -->
+        <div class="download-card">
+          <div class="download-card-icon">📸</div>
+          <div class="download-card-info">
+            <strong>HD Keepsake Image Card (.png)</strong>
+            <span>Crystal-clear 1200x1400 keepsake poster with your names, glowing heart, and vows.</span>
+          </div>
+          <button type="button" id="downloadPngCardBtn" class="deck-btn card-action-btn">
+            <span class="deck-btn-icon">💾</span>
+            <span>Download PNG Card</span>
+          </button>
+        </div>
+
+        <!-- Option 3: Official Love Certificate -->
+        <div class="download-card">
+          <div class="download-card-icon">📜</div>
+          <div class="download-card-info">
+            <strong>Official Love &amp; Proposal Certificate</strong>
+            <span>A sealed and signed digital certificate celebrating your eternal bond and vows.</span>
+          </div>
+          <button type="button" id="downloadCertActionBtn" class="deck-btn cert-action-btn">
+            <span class="deck-btn-icon">💍</span>
+            <span>Save Certificate</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="modal-actions center-actions">
+        <button type="button" id="doneDownloadModalBtn" class="modal-cancel-btn">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast for feedback notifications -->
+  <div id="toastNotification" class="toast-notification" hidden role="status" aria-live="polite"></div>
+
+  <script src="script.js?v=3"></script>
 </body>
 </html>
