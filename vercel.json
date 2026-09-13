@@ -3,7 +3,7 @@
   "outputDirectory": "public",
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api" },
-    { "source": "/p/(.*)", "destination": "/index.html" },
-    { "source": "/(.*)", "destination": "/$1" }
+    { "source": "/p/(.*\\.(css|js|png|jpg|jpeg|svg|ico|json|webm|mp4|webp|mp3|woff2?))", "destination": "/$1" },
+    { "source": "/p/(.*)", "destination": "/index.html" }
   ]
 }

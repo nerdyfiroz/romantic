@@ -589,6 +589,9 @@ const staticOptions = {
 };
 app.use(express.static(path.join(__dirname, 'public'), staticOptions));
 app.use(express.static(__dirname, staticOptions));
+// Also serve static assets under /p/ prefix if requested with relative paths
+app.use('/p', express.static(path.join(__dirname, 'public'), staticOptions));
+app.use('/p', express.static(__dirname, staticOptions));
 
 // Route non-asset URLs to index.html (never serve index.html for static assets)
 app.get('*', (req, res) => {

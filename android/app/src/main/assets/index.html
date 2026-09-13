@@ -11,12 +11,13 @@
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <base href="/" />
   <link rel="manifest" href="/manifest.json" />
   <link rel="apple-touch-icon" href="/icons/icon-192.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css?v=3" />
+  <link rel="stylesheet" href="/style.css?v=4" />
   <script>
     function dismissSenderAlertImmediate(e) {
       if (e) {
@@ -427,6 +428,108 @@
           <textarea id="inputCustomNote" class="custom-note-input" rows="2" placeholder="Write a special private sentence from your heart to appear in the letter..."></textarea>
         </div>
 
+        <!-- Romantic Background Music Section -->
+        <div class="form-group music-customizer-section" id="musicCustomizerSection">
+          <div class="music-section-header">
+            <label class="music-section-title">
+              <span>🎵 Romantic Background Music</span>
+              <span class="music-license-tag">Royalty-Free &amp; Licensed</span>
+            </label>
+          </div>
+
+          <!-- Unselected state: Prompts creator to choose music -->
+          <div id="noMusicSelectedView" class="music-selection-preview-box">
+            <div class="music-box-left">
+              <div class="music-empty-disc">🎼</div>
+              <div class="music-empty-text">
+                <strong>No Background Song Selected</strong>
+                <span>Choose licensed romantic piano, acoustic, or cinematic melodies</span>
+              </div>
+            </div>
+            <button type="button" id="openMusicPickerBtn" class="music-choose-btn">
+              <span>🎵</span> Choose Music
+            </button>
+          </div>
+
+          <!-- Selected state: Shows active track with preview, change, remove -->
+          <div id="selectedMusicView" class="music-selection-preview-box active" hidden>
+            <div class="music-box-left">
+              <div class="music-disc-icon" id="selectedMusicDiscIcon">💿</div>
+              <div class="music-track-meta">
+                <div class="music-title-line">
+                  <strong id="selectedMusicTitle" class="music-title-text">Heartwarming</strong>
+                  <span id="selectedMusicCategoryBadge" class="music-cat-chip">Piano</span>
+                </div>
+                <div class="music-subline">
+                  <span id="selectedMusicArtist" class="music-artist-text">Kevin MacLeod</span>
+                  <span class="music-dot">•</span>
+                  <span id="selectedMusicDuration" class="music-duration-text">2:14</span>
+                  <span class="music-dot">•</span>
+                  <button type="button" id="viewSelectedLicenseBtn" class="music-license-link">License ⓘ</button>
+                </div>
+              </div>
+            </div>
+            <div class="music-action-group">
+              <button type="button" id="previewSelectedMusicBtn" class="music-action-btn preview-btn" title="Preview track" aria-label="Preview track">
+                <span id="previewSelectedIcon">▶</span>
+              </button>
+              <button type="button" id="changeMusicBtn" class="music-action-btn change-btn" title="Change to different melody">
+                Change
+              </button>
+              <button type="button" id="removeMusicBtn" class="music-action-btn remove-btn" title="Remove background music" aria-label="Remove background music">
+                ✕
+              </button>
+            </div>
+          </div>
+
+          <!-- Music Customization Drawer (Volume, Loop, Start Time, Fade In/Out) -->
+          <div id="musicCustomizationDrawer" class="music-customization-drawer" hidden>
+            <div class="music-drawer-title">Music Customization</div>
+            <div class="music-controls-grid">
+              <div class="music-ctrl-card">
+                <div class="music-ctrl-label-row">
+                  <label for="musicVolumeInput">Volume</label>
+                  <span id="musicVolumeVal" class="ctrl-val-badge">35%</span>
+                </div>
+                <input type="range" id="musicVolumeInput" min="0" max="1" step="0.05" value="0.35" class="music-range-slider" />
+              </div>
+
+              <div class="music-ctrl-card">
+                <div class="music-ctrl-label-row">
+                  <label for="musicLoopCheckbox">Loop Song</label>
+                  <span id="musicLoopVal" class="ctrl-val-badge">ON</span>
+                </div>
+                <label class="music-toggle-switch">
+                  <input type="checkbox" id="musicLoopCheckbox" checked />
+                  <span class="music-switch-track"></span>
+                </label>
+              </div>
+
+              <div class="music-ctrl-card">
+                <div class="music-ctrl-label-row">
+                  <label for="musicStartTimeInput">Start Offset</label>
+                  <span id="musicStartTimeVal" class="ctrl-val-badge">0s</span>
+                </div>
+                <input type="range" id="musicStartTimeInput" min="0" max="60" step="1" value="0" class="music-range-slider" />
+              </div>
+
+              <div class="music-ctrl-card">
+                <div class="music-ctrl-label-row">
+                  <label for="musicFadeInInput">Fade In / Out</label>
+                  <span id="musicFadeInVal" class="ctrl-val-badge">3s</span>
+                </div>
+                <input type="range" id="musicFadeInInput" min="0" max="10" step="1" value="3" class="music-range-slider" />
+              </div>
+            </div>
+
+            <!-- Attribution Statement Display -->
+            <div id="musicAttributionDisplay" class="music-attribution-banner" hidden>
+              <span class="attr-icon">📜</span>
+              <span id="musicAttributionText" class="attr-text"></span>
+            </div>
+          </div>
+        </div>
+
         <div class="modal-actions">
           <button type="submit" class="modal-submit-btn" id="saveStoryBtn">Apply Preview Here ✨</button>
           <button type="button" class="modal-submit-btn secondary" id="createAndShareBtn">Generate Shareable Link 💌</button>
@@ -645,9 +748,116 @@
     </div>
   </div>
 
+  <!-- Modal for Searching, Previewing, and Selecting Royalty-Free Music -->
+  <div id="musicPickerModal" class="customizer-modal music-modal" hidden>
+    <div class="modal-backdrop" id="musicPickerBackdrop"></div>
+    <div class="modal-card music-picker-modal-card" role="dialog" aria-modal="true" aria-labelledby="musicPickerHeading">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <span class="modal-heart-icon">🎵</span>
+          <div>
+            <h3 id="musicPickerHeading">Choose Romantic Music</h3>
+            <p class="modal-subtitle">Royalty-free &amp; licensed background melodies for your proposal</p>
+          </div>
+        </div>
+        <button type="button" id="closeMusicPickerBtn" class="close-modal-btn" aria-label="Close music picker">✕</button>
+      </div>
+
+      <!-- Search Box & Categories -->
+      <div class="music-search-section">
+        <div class="music-search-bar">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="musicSearchInput" placeholder="Search romantic piano, wedding, emotional, acoustic, bangla..." maxlength="60" autocomplete="off" />
+          <button type="button" id="clearMusicSearchBtn" class="music-clear-btn" hidden aria-label="Clear search">✕</button>
+          <button type="button" id="executeMusicSearchBtn" class="music-search-action-btn">Search</button>
+        </div>
+
+        <!-- Category Pills -->
+        <div class="music-categories-scroll" id="musicCategoriesBar" role="tablist" aria-label="Melody Moods">
+          <!-- Populated dynamically via JS -->
+        </div>
+      </div>
+
+      <!-- Results Toolbar -->
+      <div class="music-list-toolbar">
+        <span id="musicTracksCount" class="music-counter-badge">Loading melodies...</span>
+        <span class="music-guarantee">✓ 100% Permitted for Commercial &amp; Web Apps</span>
+      </div>
+
+      <!-- Scrollable Track List Container -->
+      <div class="music-tracks-list" id="musicTracksList" role="list">
+        <!-- Rendered dynamically via JS -->
+      </div>
+
+      <!-- Picker Footer with Preview Status & Done -->
+      <div class="music-picker-footer">
+        <div class="music-current-preview-bar" id="musicPreviewStatusBar">
+          <span id="musicPreviewStatusIcon" class="status-pulse-dot"></span>
+          <span id="musicPreviewStatusText">Click "Preview" to listen. Only one preview plays at a time.</span>
+        </div>
+        <div class="music-footer-actions">
+          <button type="button" id="closePickerDoneBtn" class="modal-cancel-btn">Done</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal for Displaying Full License & Attribution Details -->
+  <div id="licenseInfoModal" class="customizer-modal license-modal" hidden>
+    <div class="modal-backdrop" id="licenseModalBackdrop"></div>
+    <div class="modal-card license-modal-card" role="dialog" aria-modal="true" aria-labelledby="licenseModalHeading">
+      <div class="modal-header">
+        <div class="modal-title-wrap">
+          <span class="modal-heart-icon">📜</span>
+          <div>
+            <h3 id="licenseModalHeading">License &amp; Copyright Compliance</h3>
+            <p class="modal-subtitle">Official royalty-free licensing specifications</p>
+          </div>
+        </div>
+        <button type="button" id="closeLicenseModalBtn" class="close-modal-btn" aria-label="Close license info">✕</button>
+      </div>
+      <div class="license-modal-content" id="licenseModalContent">
+        <!-- Injected dynamically -->
+      </div>
+      <div class="modal-actions">
+        <button type="button" id="dismissLicenseModalBtn" class="modal-submit-btn">Close License Info</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Floating Recipient Music Player Widget -->
+  <div id="recipientMusicWidget" class="recipient-music-widget" hidden>
+    <button type="button" id="recipientMusicPlayBtn" class="recipient-play-btn" aria-label="Play / pause background song">
+      <span id="recipientPlayIcon">▶</span>
+    </button>
+    <div class="recipient-track-details" id="recipientTrackDetails">
+      <div class="recipient-track-title-row">
+        <span class="recipient-track-note-icon">🎵</span>
+        <span id="recipientTrackTitle" class="recipient-track-title">Romantic Melody</span>
+      </div>
+      <div class="recipient-track-sub-row">
+        <span id="recipientTrackArtist" class="recipient-track-artist">Kevin MacLeod</span>
+        <span class="recipient-dot">•</span>
+        <button type="button" id="recipientLicenseBtn" class="recipient-license-tag" title="View official license">License ⓘ</button>
+      </div>
+    </div>
+    <div class="recipient-vol-group">
+      <button type="button" id="recipientMuteBtn" class="recipient-mute-btn" title="Mute / unmute" aria-label="Mute / unmute">🔊</button>
+      <input type="range" id="recipientVolSlider" min="0" max="1" step="0.05" value="0.35" class="recipient-vol-slider" aria-label="Volume slider" />
+    </div>
+  </div>
+
+  <!-- Soft Recipient Music Activation Prompt Banner -->
+  <div id="recipientMusicTapPrompt" class="recipient-music-prompt-pill" hidden>
+    <span class="prompt-icon">🎵</span>
+    <span id="recipientPromptText">Tap anywhere to hear our romantic song</span>
+    <button type="button" id="dismissMusicPromptBtn" class="prompt-dismiss-btn" aria-label="Dismiss">✕</button>
+  </div>
+
   <!-- Toast for feedback notifications -->
   <div id="toastNotification" class="toast-notification" hidden role="status" aria-live="polite"></div>
 
-  <script src="script.js?v=3"></script>
+  <script src="/music-client.js?v=4"></script>
+  <script src="/script.js?v=4"></script>
 </body>
 </html>

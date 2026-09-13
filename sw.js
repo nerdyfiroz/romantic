@@ -1,6 +1,9 @@
-const CACHE_NAME = 'romantic-v3';
+const CACHE_NAME = 'romantic-v4';
 const STATIC_ASSETS = [
   '/',
+  '/style.css?v=4',
+  '/script.js?v=4',
+  '/music-client.js?v=4',
   '/manifest.json',
   '/icons/icon-192.png',
   '/icons/icon-512.png',
@@ -39,10 +42,14 @@ self.addEventListener('fetch', (event) => {
     fetch(event.request)
       .then((networkResponse) => {
         if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic') {
-          const responseToCache = networkResponse.clone();
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(event.request, responseToCache);
-          });
+          const contentType = networkResponse.headers.get('content-type') || '';
+          const isCodeAsset = /\.(css|js)/i.test(event.request.url);
+          if (!(isCodeAsset && contentType.includes('text/html'))) {
+            const responseToCache = networkResponse.clone();
+            caches.open(CACHE_NAME).then((cache) => {
+              cache.put(event.request, responseToCache);
+            });
+          }
         }
         return networkResponse;
       })

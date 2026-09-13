@@ -1672,6 +1672,9 @@ function openModal() {
   else if (dynamicBoyToGirl) dynamicBoyToGirl.checked = true;
 
   updateDynamicLabels();
+  if (window.syncMusicCustomizerUI) {
+    window.syncMusicCustomizerUI();
+  }
   customizerModal.hidden = false;
   setTimeout(() => inputPartner.focus(), 80);
 }
@@ -1704,6 +1707,15 @@ namesForm.addEventListener("submit", (e) => {
   localStorage.setItem("romantic_emotion_choice", selectedEmotionChoice);
   localStorage.setItem("romantic_dynamic", newDynamic);
   localStorage.setItem("romantic_custom_note", newCustomNote);
+
+  if (window.getCurrentMusicConfig) {
+    const musicCfg = window.getCurrentMusicConfig();
+    if (musicCfg && musicCfg.track_id) {
+      localStorage.setItem("romantic_music_config", JSON.stringify(musicCfg));
+    } else {
+      localStorage.removeItem("romantic_music_config");
+    }
+  }
 
   // Update URL Query Parameters
   const params = new URLSearchParams(window.location.search);
@@ -1753,6 +1765,7 @@ async function handleCreateAndShareProposal() {
 
   const emotionChoice = selectEmotion ? selectEmotion.value : selectedEmotionChoice;
   const customNote = inputCustomNote ? inputCustomNote.value.trim() : currentCustomNote;
+  const musicConfig = window.getCurrentMusicConfig ? window.getCurrentMusicConfig() : null;
 
   closeModal();
 
@@ -1771,7 +1784,8 @@ async function handleCreateAndShareProposal() {
         animSpeed: currentAnimSpeed,
         particleDensity: currentParticleDensity,
         touchFx: currentTouchFx,
-        customNote
+        customNote,
+        music: musicConfig
       })
     });
 
@@ -2611,6 +2625,15 @@ async function initApp() {
           if (proposal.particleDensity) currentParticleDensity = proposal.particleDensity;
           if (proposal.touchFx) currentTouchFx = proposal.touchFx;
 
+          if (proposal.music) {
+            if (window.setCurrentMusicConfig) {
+              window.setCurrentMusicConfig(proposal.music);
+            }
+            if (paramView !== "tracker" && window.initRecipientMusicExperience) {
+              window.initRecipientMusicExperience(proposal.music);
+            }
+          }
+
           // If view !== 'tracker', this is Recipient Proposal View
           if (paramView !== "tracker") {
             isRecipientProposalMode = true;
@@ -2649,6 +2672,14 @@ async function initApp() {
     // If sender already created an active proposal in their session, track it silently
     activeProposalId = storedProposalId;
     startTrackingProposal(storedProposalId);
+  } else {
+    // Regular creator mode: load previously customized music if any
+    const storedMusic = localStorage.getItem("romantic_music_config");
+    if (storedMusic && window.setCurrentMusicConfig) {
+      try {
+        window.setCurrentMusicConfig(JSON.parse(storedMusic));
+      } catch (_) {}
+    }
   }
 
   // Seed changes on refresh if auto emotion

@@ -39,4 +39,26 @@ if (fs.existsSync(iconsSrc)) {
   });
 }
 
+// Also sync Android assets if folder exists
+const androidAssetsDir = path.join(rootDir, 'android', 'app', 'src', 'main', 'assets');
+if (fs.existsSync(androidAssetsDir)) {
+  filesToCopy.forEach((file) => {
+    const src = path.join(rootDir, file);
+    const dest = path.join(androidAssetsDir, file);
+    if (fs.existsSync(src)) {
+      fs.copyFileSync(src, dest);
+    }
+  });
+  const androidIconsDest = path.join(androidAssetsDir, 'icons');
+  if (fs.existsSync(iconsSrc)) {
+    if (!fs.existsSync(androidIconsDest)) {
+      fs.mkdirSync(androidIconsDest, { recursive: true });
+    }
+    const iconFiles = fs.readdirSync(iconsSrc);
+    iconFiles.forEach((iconFile) => {
+      fs.copyFileSync(path.join(iconsSrc, iconFile), path.join(androidIconsDest, iconFile));
+    });
+  }
+}
+
 console.log('Successfully prepared public directory for Vercel deployment!');
